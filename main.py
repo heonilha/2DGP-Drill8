@@ -1,11 +1,14 @@
 from pico2d import *
 from grass import Grass
+from boy import Boy
 
 def reset_world():
     global world
     world = []
     grass = Grass()
     world.append(grass)
+    boy= Boy()
+    world.append(boy)
 
     pass
 
