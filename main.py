@@ -1,25 +1,33 @@
 from pico2d import *
-
-open_canvas()
+from grass import Grass
 
 def reset_world():
+    global world
+    world = []
+    grass = Grass()
+    world.append(grass)
+
     pass
-
-running=True
-
-reset_world()
 
 def handle_events():
     pass
 
-
 def update_world():
+    for o in world:
+        o.update()
     pass
-
 
 def render_world():
+    clear_canvas()
+    for o in world:
+        o.draw()
+    update_canvas()
     pass
 
+running=True
+
+open_canvas()
+reset_world()
 
 while running:
     handle_events()
