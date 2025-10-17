@@ -67,10 +67,21 @@ class Boy:
         self.face_dir = 1
         self.IDLE = Idle(self)
         self.RUN = RUN(self)
-        self.state_machine= StateMachine(self.RUN)
+        self.state_machine= (StateMachine(
+            self.IDLE,
+            {
+                self.IDLE: { right_down: self.RUN, left_down: self.RUN, right_up: self.RUN,
+                            left_up: self.RUN},
+                self.RUN: {right_up: self.IDLE, left_up: self.IDLE, right_down: self.IDLE, left_down: self.IDLE}
+
+            }))
     def update(self):
         self.state_machine.update()
 
     def draw(self):
         self.state_machine.draw()
     pass
+
+    def handle_event(self, event):
+        self.state_machine.handle_state_event(('INPUT', event))
+        pass
