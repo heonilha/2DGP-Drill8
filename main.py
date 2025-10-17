@@ -2,14 +2,13 @@ from pico2d import *
 
 open_canvas()
 
-
 def reset_world():
     pass
 
 running=True
 
 reset_world()
-# game loop
+
 def handle_events():
     pass
 
@@ -27,5 +26,4 @@ while running:
     update_world()
     render_world()
     delay(0.05)
-# finalization code
 close_canvas()
