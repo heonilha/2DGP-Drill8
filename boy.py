@@ -10,6 +10,45 @@ def left_down(e):
     return e[0]=='INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_LEFT
 def left_up(e):
     return e[0]=='INPUT' and e[1].type == SDL_KEYUP and e[1].key == SDLK_LEFT
+def a_down(e): return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_a
+def time_out(e): return e[0] == 'TIME_OUT'
+from pico2d import *
+
+class AUTORUN:
+    def __init__(self, boy):
+        self.boy = boy
+
+    def enter(self, e):
+        self.boy.start_time = get_time()
+        self.boy.speed = 10
+        if self.boy.face_dir == 0:
+            self.boy.face_dir = 1
+        self.boy.dir = self.boy.face_dir
+
+    def exit(self, e):
+        pass
+
+    def do(self):
+        self.boy.frame = (self.boy.frame + 1) % 8
+        self.boy.x += self.boy.dir * self.boy.speed
+
+        if self.boy.x > 800:
+            self.boy.x = 800
+            self.boy.dir = -1
+            self.boy.face_dir = -1
+        elif self.boy.x < 0:
+            self.boy.x = 0
+            self.boy.dir = 1
+            self.boy.face_dir = 1
+
+        if get_time() - self.boy.start_time > 5:
+            self.boy.state_machine.handle_state_event(('TIME_OUT', None))
+
+    def draw(self):
+        if self.boy.face_dir == 1:
+            self.boy.image.clip_draw(self.boy.frame * 100, 100, 100, 100, self.boy.x, self.boy.y, 120, 120)
+        else:
+            self.boy.image.clip_draw(self.boy.frame * 100, 0, 100, 100, self.boy.x, self.boy.y, 120, 120)
 
 class RUN:
 
@@ -67,13 +106,14 @@ class Boy:
         self.face_dir = 1
         self.IDLE = Idle(self)
         self.RUN = RUN(self)
+        self.AUTORUN = AUTORUN(self)
         self.state_machine= (StateMachine(
             self.IDLE,
             {
                 self.IDLE: { right_down: self.RUN, left_down: self.RUN, right_up: self.RUN,
-                            left_up: self.RUN},
-                self.RUN: {right_up: self.IDLE, left_up: self.IDLE, right_down: self.IDLE, left_down: self.IDLE}
-
+                            left_up: self.RUN,a_down:self.AUTORUN},
+                self.RUN: {right_up: self.IDLE, left_up: self.IDLE, right_down: self.IDLE, left_down: self.IDLE},
+                self.AUTORUN: {time_out: self.IDLE}
             }))
     def update(self):
         self.state_machine.update()
